@@ -5,7 +5,7 @@ package.domain = ci.monsalaire
 source.dir = .
 source.include_exts = py,png,jpg,txt,md,ttf
 version = 6.0.0
-requirements = python3==3.11.5,hostpython3==3.11.5,kivy==2.3.0,sqlite3,certifi,pillow,openssl
+requirements = python3,kivy,sqlite3,certifi,pillow
 orientation = portrait
 android.permissions = INTERNET
 android.allow_backup = True
