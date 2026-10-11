@@ -1,1 +1,53 @@
 
+name: Construire MON SALAIRE APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+
+    steps:
+      - name: Recuperer le projet
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Installer Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Installer les dependances systeme
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git zip unzip autoconf automake libtool \
+            pkg-config zlib1g-dev libncurses5-dev \
+            cmake libffi-dev libssl-dev libsqlite3-dev \
+            build-essential
+          python -m pip install --upgrade pip
+          pip install buildozer cython==0.29.36
+
+      - name: Verifier le projet
+        run: |
+          test -f main.py
+          test -f buildozer.spec
+
+      - name: Construire l APK Android
+        run: buildozer -v android debug
+
+      - name: Publier le fichier APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MON_SALAIRE_APK
+          path: bin/*.apk
+          if-no-files-found: error
