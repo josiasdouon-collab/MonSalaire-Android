@@ -1,4 +1,3 @@
-
 name: Construire MON SALAIRE APK
 
 on:
@@ -34,8 +33,18 @@ jobs:
             pkg-config zlib1g-dev libncurses5-dev \
             cmake libffi-dev libssl-dev libsqlite3-dev \
             build-essential
+
           python -m pip install --upgrade pip
           pip install buildozer cython==0.29.36
+
+      - name: Accepter les licences Android
+        run: |
+          mkdir -p "$HOME/.buildozer"
+          yes | buildozer android update || true
+          SDK="$HOME/.buildozer/android/platform/android-sdk"
+          if [ -d "$SDK/cmdline-tools/latest/bin" ]; then
+            yes | "$SDK/cmdline-tools/latest/bin/sdkmanager" --licenses || true
+          fi
 
       - name: Verifier le projet
         run: |
@@ -43,7 +52,7 @@ jobs:
           test -f buildozer.spec
 
       - name: Construire l APK Android
-        run: buildozer -v android debug
+        run: yes | buildozer -v android debug
 
       - name: Publier le fichier APK
         uses: actions/upload-artifact@v4
