@@ -1,0 +1,142 @@
+MON SALAIRE V6 WINDOWS - CORRECTION
+
+Erreur corrigée :
+TypeError: argument should be a str or an os.PathLike object where __fspath__ returned non-str
+
+Cause : main.py utilisait App.user_data_dir au niveau global avant la création de l'instance Kivy.
+
+Correction : le chemin de la base SQLite est maintenant construit dans DBMixin.init_db() à partir de self.user_data_dir, une fois l'application Kivy démarrée.
+
+Pour reconstruire :
+1. Ouvrir ce dossier dans Visual Studio Code.
+2. Ouvrir un terminal.
+3. Double-cliquer sur CREER_EXE.bat ou lancer .\\CREER_EXE.bat.
+4. L'EXE se trouve dans dist\\MON SALAIRE\\MON SALAIRE.exe
+
+
+--- CORRECTIONS COMPLEMENTAIRES (V6 corrige 2) ---
+
+1. Plantage au demarrage (KV invalide)
+   Les 3 cartes colorees de l'accueil utilisaient "Color: rgba: ..." et
+   "RoundedRectangle: pos: ...; size: ..." sur une seule ligne, ce que Kivy refuse
+   ("Invalid data after declaration"). Ecrit maintenant sur plusieurs lignes.
+
+2. Bouton "Reessayer" inoperant
+   Les ecrans etaient ajoutes seulement si la base s'ouvrait dans build().
+   Les ecrans sont maintenant toujours charges ; la base est ouverte une seule fois
+   dans startup(), donc "Reessayer" fonctionne vraiment.
+
+3. Base de donnees ouverte deux fois
+   init_db() est maintenant repetable : l'ancienne connexion est fermee avant d'en
+   ouvrir une nouvelle.
+
+4. Totaux "Scolarite / prets" effaces
+   Dans CommitmentsScreen.refresh(), une seconde affectation ecrasait le texte et
+   supprimait "Total mensualites prets", "Provision scolarite mensuelle" et
+   "Engagements mensuels". Cette seconde affectation est supprimee.
+
+Test : application demarree en mode sans ecran, les 8 ecrans s'ouvrent sans erreur ;
+Reste = salaire - depenses - engagements verifie (300 000 - 15 000 = 285 000 F).
+
+
+--- CORRECTIONS COMPLEMENTAIRES (V6 corrige 3) ---
+
+1. Emojis affiches en carres : sous Windows, la police Segoe UI Emoji (ou Segoe UI Symbol)
+   est maintenant utilisee comme police par defaut. "13e" remplace "13" + "e" en exposant
+   (caractere absent de la police) et l'emoji famille compose est remplace par un emoji simple.
+2. Textes sombres illisibles sur fond noir : titres et textes secondaires passes en clair.
+3. Bouton "Scolarite / prets" coupe et cache : la grille de l'accueil s'adapte maintenant
+   a son contenu (3 lignes).
+4. Ecran de demarrage : textes d'etat lisibles sur fond clair.
+
+
+--- REFONTE VISUELLE (V6 corrige 4) : interface alignee sur la maquette ---
+
+- Fond clair, bandeau bleu marine, cartes blanches arrondies, carte verte "Salaire net".
+- Les emojis (qui s'affichaient en carres) sont remplaces par de vraies icones illustrees,
+  decoupees dans la maquette : dossier assets\ (12 categories, accueil, alimentation, portefeuille).
+- Ecran Budget mensuel : une ligne par categorie (icone, %, montant) + barre TOTAL.
+- Ecran Detail alimentation : icones sac de riz, viande/poisson, legumes, pain, autres.
+- Chaque ecran a une barre de titre avec fleche de retour.
+- La fenetre s'ouvre au format telephone (432 x 700) et reste redimensionnable.
+- Plus de dependance aux polices Windows : aucun caractere special non supporte.
+- CREER_EXE.bat / CREER_EXE_UN_SEUL.bat / .spec : le dossier assets est ajoute a l'EXE.
+IMPORTANT : le dossier assets doit rester a cote de main.py avant de lancer CREER_EXE.bat.
+
+
+--- CORRECTION (V6 corrige 5) : "Ecrans non charges" au demarrage ---
+
+Cause : l'ecran de demarrage lancait sa verification des que Kivy l'affichait, avant que
+les autres ecrans (accueil, budget...) soient ajoutes. Elle echouait donc a chaque fois.
+Correction : la verification attend maintenant que tous les ecrans soient charges.
+Teste avec un vrai lancement de l'application : "Pret." puis ouverture de l'accueil.
+
+
+--- NOUVEAUTE (V6 corrige 6) : GRAPHIQUES ---
+
+Le bouton "Rapports" de l'accueil ouvre maintenant un ecran de graphiques :
+ 1. Repartition du budget : graphique en anneau + legende (pourcentages du budget).
+ 2. Depenses par categorie : barres, avec la part du salaire deja utilisee.
+ 3. Evolution du salaire net : colonnes sur les 6 derniers salaires enregistres.
+Le bouton "Voir l'historique detaille" en bas ouvre l'ancien historique en liste.
+Les graphiques sont dessines par Kivy : aucune bibliotheque supplementaire a installer.
+
+
+--- NOUVEAUTE (V6 corrige 7) : MENUS EPARGNE ET OBJECTIFS ---
+
+Les boutons Epargne et Objectifs de l'accueil ouvraient le meme ecran que Budget.
+Chacun a maintenant son propre menu :
+
+EPARGNE (argent reellement mis de cote)
+ - Total epargne + part du salaire.
+ - Objectif mensuel = pourcentage "Epargne" du Budget, compare aux versements du mois.
+ - Ajouter une epargne : versement ou retrait, montant, objectif concerne, date, source.
+   Un retrait ne peut pas depasser le solde de l'objectif.
+ - Voir les details : resume, evolution sur 6 mois, avancement par objectif.
+ - Historique : tous les mouvements, avec suppression.
+ - Mes differentes epargnes : une ligne par objectif + "Epargne libre".
+
+OBJECTIFS (projets a financer)
+ - Creer un objectif : type (maison, voiture, etudes, voyage, projet, urgence), nom,
+   description, montant cible, date souhaitee, epargne mensuelle prevue,
+   priorite (Urgente / Normale / Secondaire).
+ - Tableau : objectifs actifs, montant total, echeance la plus proche, taux de realisation.
+ - Chaque objectif : montant reuni, reste a financer, barre de progression, mois restants,
+   date previsionnelle d'atteinte et conseil d'epargne mensuelle.
+ - Modifier / supprimer (l'argent epargne passe en "Epargne libre", rien n'est perdu).
+
+LIEN ENTRE LES DEUX : chaque versement enregistre dans Epargne met a jour
+automatiquement la progression de l'objectif correspondant (pas de double comptage).
+
+Les donnees existantes sont conservees : deux nouvelles tables sont ajoutees a la base.
+Android : la touche Retour du telephone revient a l'ecran precedent.
+
+
+--- CORRECTION (V6 corrige 8) : "no such column: g.note" a l'ouverture de Epargne ---
+
+Cause : la base de donnees de l'utilisateur contenait deja une ancienne table "goals"
+(version precedente) avec d'autres colonnes ; la nouvelle table n'etait donc pas creee.
+Correction : au demarrage, si une ancienne table "goals" ou "savings" est incompatible,
+elle est conservee sous un autre nom (ex. goals_ancien_AAAAMMJJHHMMSS) et la nouvelle
+table est creee. Aucune donnee n'est supprimee.
+
+V6 corrige 9
+- Les 3 traits de l'accueil ouvrent maintenant un menu latéral (tous les écrans + Remise à zéro).
+- Nouvel écran "Remise à zéro" : par catégorie (dépenses, salaire, 13e mois, épargne, objectifs,
+  scolarité/prêts, budget) et "Tout remettre à zéro" avec double confirmation.
+- Boutons de remise à zéro aussi dans Dépenses, Salaire, 13e mois, Budget, Alimentation, Scolarité/prêts.
+- La touche Retour ferme le menu.
+
+V6 corrige 10 - Scan de reçu (Gemini)
+- Écran Dépenses : "Photo du reçu", "Reçu de la galerie", "Réglages du scan (clé Gemini)".
+- Le reçu est lu par Gemini (clé gratuite aistudio.google.com) : montant, date, catégorie.
+  Le formulaire est pré-rempli, rien n'est enregistré avant "Ajouter".
+- Nouveaux fichiers : receipt.py (lecture), imagepick.py (photo / galerie).
+- buildozer.spec : permission INTERNET, certifi, pillow, openssl.
+
+V6 corrige 11 - Mode courses
+- Nouvel écran "Courses" (menu 3 traits + bouton dans Dépenses) : panier avec budget de la catégorie.
+- Chaque article (nom, prix, quantité) est comparé au budget : Reste / Dépassement en direct,
+  alerte quand il reste moins de 10 %, confirmation avant de dépasser le budget.
+- "Valider les achats" enregistre chaque article dans les dépenses (avec son nom).
+- Le panier est conservé si l'application est fermée.

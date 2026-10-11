@@ -1,0 +1,12 @@
+CREER L'APK AVEC GITHUB (sans rien installer)
+==============================================
+1. github.com > compte gratuit > "New repository" > nom : monsalaire > Private > Create.
+2. "uploading an existing file" : glissez TOUT le contenu du dossier (main.py, assets, buildozer.spec, ...)
+   puis "Commit changes".
+3. Le dossier cache ".github" est souvent ignore par le navigateur. Alors :
+   "Add file" > "Create new file", dans le nom tapez exactement :  .github/workflows/apk.yml
+   Collez le contenu du fichier apk.yml (fourni a la racine), puis "Commit changes".
+4. Onglet "Actions" > "Construire l'APK" > "Run workflow" (bouton vert).
+5. Attendre 20 a 40 min. Cliquer sur l'execution terminee > en bas "Artifacts" > MON_SALAIRE_APK.
+6. Dezipper : l'APK est dedans. Copier sur le telephone et l'installer.
+Si ca echoue : ouvrir l'etape rouge, copier les dernieres lignes et me les envoyer.

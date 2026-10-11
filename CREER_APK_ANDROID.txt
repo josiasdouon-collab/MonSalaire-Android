@@ -1,0 +1,20 @@
+CREER L'APK ANDROID - MON SALAIRE
+=================================
+L'application est deja prete pour Android (meme code que Windows).
+Il faut seulement la compiler. Deux methodes :
+
+METHODE 1 - Ubuntu / WSL (sur votre PC)
+1. Ouvrir Ubuntu et aller dans le dossier (le script se copie tout seul dans ~/monsalaire):
+     cp -r /mnt/c/chemin/MonSalaire_Windows_V6 ~/monsalaire
+     cd ~/monsalaire
+2. bash CREER_APK_WSL.sh      (30 a 60 min la 1re fois)
+3. L'APK est dans  bin/monsalairesci-6.0.0-arm64-v8a_armeabi-v7a-debug.apk
+4. Le copier sur le telephone, l'ouvrir, autoriser "sources inconnues".
+
+METHODE 2 - GitHub (sans rien installer)
+1. Creer un depot GitHub et y envoyer tout le dossier (le dossier .github inclus).
+2. Onglet Actions > "Construire l'APK" > Run workflow.
+3. Telecharger l'artefact MON_SALAIRE_APK (zip contenant l'APK).
+
+Les donnees sont stockees dans la memoire privee de l'application (SQLite).
+Aucune permission Android n'est demandee.
